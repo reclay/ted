@@ -371,7 +371,7 @@ $navbar-collapse-max-height:       340px !default;
 
 $navbar-default-color:             rgb(10, 19, 27) !default;
 $navbar-default-bg:                rgb(10, 19, 27) !default;
-$navbar-default-border:            lighten($navbar-default-bg, 20.5%) !default;
+$navbar-default-border:            darken($navbar-default-bg, 6.5%) !default;
 
 // Navbar links
 $navbar-default-link-color:                #777 !default;

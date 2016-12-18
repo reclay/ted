@@ -1,112 +1,116 @@
 <!doctype html>
 <html lang="zh">
+
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>TED Search & Display</title>
     <link href="./img/favicon.ico" rel="shortcut icon">
     <link rel="stylesheet" href="./css/bootstrap.css">
     <link rel="stylesheet" href="./css/dataTables.bootstrap.css">
 </head>
-<body>
-<nav class="navbar navbar-default" role="navigation">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <!--<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"-->
-            <!--data-target="#bs-example-navbar-collapse-1">-->
-            <!--<span class="sr-only">Toggle navigation</span>-->
-            <!--<span class="icon-bar"></span>-->
-            <!--<span class="icon-bar"></span>-->
-            <!--<span class="icon-bar"></span>-->
-            <!--</button>-->
-            <a class="navbar-brand" href="#">TED Search & Display</a>
-        </div>
-        <img class="nav-img hidden-xs" src="./img/tedlogo.jpg" alt="">
-    </div><!-- /.container-fluid -->
-</nav>
-<div class="container-fluid" id="app">
-    <div class="row">
-        <div v-show="!showTable" class="hidden-xs col-sm-3 col-md-4">
 
+<body>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <!--<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"-->
+                <!--data-target="#bs-example-navbar-collapse-1">-->
+                <!--<span class="sr-only">Toggle navigation</span>-->
+                <!--<span class="icon-bar"></span>-->
+                <!--<span class="icon-bar"></span>-->
+                <!--<span class="icon-bar"></span>-->
+                <!--</button>-->
+                <a class="navbar-brand" href="#">TED Search & Display</a>
+            </div>
+            <img class="nav-img hidden-xs " src="./img/tedlogo.jpg" alt="">
         </div>
-        <div class="col-xs-12 col-sm-6 col-md-4">
-            <form role="form">
-                <div class="form-group">
-                    <div class="input-group">
-                        <input type="text" id="search-input" @keyup.enter="search" class="form-control">
-                        <span @click="search" id="search-submit" class="cursor input-group-addon">search</span>
+        <!-- /.container-fluid -->
+    </nav>
+    <div class="container-fluid" id="app">
+        <div class="row">
+            <div v-show="!showTable" class="hidden-xs col-sm-3 col-md-4">
+
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <form role="form">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" id="search-input" @keyup.enter="search" class="form-control">
+                            <span @click="search" id="search-submit" class="cursor input-group-addon">search</span>
+                        </div>
+                        <div class="search-warning alert alert-danger" v-show="searchWarning!==''">
+                            {{searchWarning}}
+                        </div>
                     </div>
-                    <div class="search-warning alert alert-danger" v-show="searchWarning!==''">
-                        {{searchWarning}}
-                    </div>
-                </div>
-                <!--当type="button"时，且存在多个输入框，回车不会提交表单。-->
-                <input type="text" class="display">
-                <button type="button" class="display"></button>
-            </form>
-        </div>
-        <!--<transition name="slide-fade">-->
-        <div v-show="showTable" class="col-xs-12 col-sm-6 col-md-8">
-            <table class="data-table table table-striped table-bordered">
-                <thead>
-                <tr>
-                    <th>title</th>
-                    <th>hits</th>
-                    <th>detail</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(result,index) in searchResults">
-                    <td>{{result.title}}</td>
-                    <td>{{result.hits}}</td>
-                    <td class="cursor">
-                        <button class="btn btn-primary" v-if="currentDetail===index" @click="detailHide(index)">hide</button>
-                        <button class="btn btn-primary" v-else @click="detailShow(index)">show</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <!--</transition>-->
-    </div>
-    <hr v-show="currentDetail>-1">
-    <div class="row">
-        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1">
-            <table v-show="currentDetail>-1" class="table table-responsive table-bordered table-striped">
-                <tr>
-                    <td>Plain Text Pattern</td>
-                    <td>{{detail.text}}</td>
-                </tr>
-                <tr>
-                    <td>Grammatical Pattern (tags)</td>
-                    <td>{{detail.tags}}</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <hr>
-    <div class="row">
-        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1">
-            <button class="btn btn-primary cursor tagset-btn" @click="tagsetToggle">Tagset</button>
-            <div v-show="showTagset" class="tagset-div">
-                <table class="data-table-tagset table table-striped table-bordered">
+                    <!--当type="button"时，且存在多个输入框，回车不会提交表单。-->
+                    <input type="text" class="display">
+                    <button type="button" class="display"></button>
+                </form>
+            </div>
+            <!--<transition name="slide-fade">-->
+            <div v-show="showTable" class="col-xs-12 col-sm-6 col-md-8">
+                <table class="data-table table table-striped table-bordered">
                     <thead>
-                    <tr>
-                        <th>key</th>
-                        <th>value</th>
-                    </tr>
+                        <tr>
+                            <th>title</th>
+                            <th>hits</th>
+                            <th>detail</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="tag in tagset">
-                        <td>{{tag.key}}</td>
-                        <td>{{tag.value}}</td>
-                    </tr>
+                        <tr v-for="(result,index) in searchResults">
+                            <td v-html="result.title"></td>
+                            <td>{{result.hits}}</td>
+                            <td class="cursor">
+                                <button class="btn btn-primary" v-if="currentDetail===index" @click="detailHide(index)">hide</button>
+                                <button class="btn btn-primary" v-else @click="detailShow(index)">show</button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
+            <!--</transition>-->
+        </div>
+        <hr v-show="currentDetail>-1">
+        <div class="row">
+            <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1">
+                <table v-show="currentDetail>-1" class="table table-responsive table-bordered table-striped">
+                    <tr>
+                        <td>Plain Text Pattern</td>
+                        <td>{{detail.text}}</td>
+                    </tr>
+                    <tr>
+                        <td>Grammatical Pattern (tags)</td>
+                        <td>{{detail.tags}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1">
+                <button class="btn btn-primary cursor tagset-btn" @click="tagsetToggle">Tagset</button>
+                <div v-show="showTagset" class="tagset-div">
+                    <table class="data-table-tagset table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>key</th>
+                                <th>value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="tag in tagset">
+                                <td>{{tag.key}}</td>
+                                <td>{{tag.value}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 </body>
 <script src="./js/jquery-3.1.1.js"></script>
 <script src="./js/bootstrap.js"></script>
@@ -114,4 +118,5 @@
 <script src="./js/jquery.dataTables.js"></script>
 <script src="./js/dataTables.bootstrap.js"></script>
 <script src="./js/custom.js"></script>
+
 </html>

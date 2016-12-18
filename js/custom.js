@@ -136,6 +136,7 @@ var tagset = [
     {key: "ZZ1 ", value: "singular letter of the alphabet (e.g. A,b)"},
     {key: "ZZ2 ", value: "plural letter of the alphabet (e.g. A's, b's)"}
 ];
+var dataTable="";
 var app = new Vue({
     el: "#app",
     data: {
@@ -164,7 +165,9 @@ var app = new Vue({
             //获取以下修改detail的值
 
             //显示detail
+            this.detail=app.searchResults[index];
             this.currentDetail = index;
+            
         },
         detailHide: function (index) {
             this.currentDetail = -1;
@@ -191,13 +194,23 @@ var app = new Vue({
                 //显示table
                 this.showTable = true;
             }
+            var data = {"query_term":value}
+            var result =$.ajax({
+                url:"http://127.0.0.1:5000/api/query",
+                data:data,
+                dataType:"jsonp",
+                async:false,
+                success:function(data){
+                  app.searchResults = data["results"];
+                }
+            });
             //去掉loading
             $("#search-submit").removeClass("loading");
             return false;
         }
     },
     mounted: function () {
-        $(".data-table").DataTable({});
+        dataTable=$(".data-table").DataTable({});
         $(".data-table-tagset").DataTable({});
     }
 });
