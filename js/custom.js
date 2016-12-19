@@ -177,13 +177,13 @@ var app = new Vue({
             $("#search-submit").addClass("loading");
             //获取修改searchResults（可能需要datatable重新绑定）
             var value = $("#search-input").val();
-            var selectValue=$("#search-select").val();
+            var selectValue = $("#search-select").val();
             if (value === "") {
                 this.searchWarning = "输入值不能为空！";
                 $("#search-submit").removeClass("loading");
             }
             else {
-                var data = {"query_term": value,"flag":selectValue};
+                var data = {"query_term": value, "flag": selectValue};
                 var result = $.ajax({
                     url: "http://123.206.83.147:5000/api/query",
                     data: data,
@@ -196,21 +196,21 @@ var app = new Vue({
                             $("#search-submit").removeClass("loading");
                         } else {
                             app.searchResults = data["results"];
-                            var length=data["results"].length;
+                            var length = data["results"].length;
                             app.searchWarning = "";
                             dataTable.clear();
                             for (var i = 0; i < length; i++) {
                                 dataTable.row.add([
                                     data["results"][i].title,
                                     data["results"][i].hits,
-                                    '<button class="btn btn-primary detail-button" data-id='+i+'>show</button>'
+                                    '<button class="btn btn-primary detail-button" data-id=' + i + '>show</button>'
                                 ]);
                             }
-                            dataTable.draw();
+                            dataTable.order([[1, 'desc']]).draw();
                             app.showTable = true;
                             $("#search-submit").removeClass("loading");
                         }
-                        app.currentDetail=-1;
+                        app.currentDetail = -1;
                     },
                     error: function () {
                         app.searchWarning = "服务器出问题了！";
@@ -223,42 +223,42 @@ var app = new Vue({
     },
     mounted: function () {
         dataTable = $(".data-table").dataTable({}).api();
-        $("tbody").click(function(e){
-            if(e.target && e.target.nodeName == "BUTTON") {
-                var index=parseInt($(e.target).attr("data-id"));
-                var flag=$(e.target).text();
-                if(flag==="show"){
+        $("tbody").click(function (e) {
+            if (e.target && e.target.nodeName == "BUTTON") {
+                var index = parseInt($(e.target).attr("data-id"));
+                var flag = $(e.target).text();
+                if (flag === "show") {
                     $("tbody button").text("show");
                     $(e.target).text("hide");
                     var detail = {};
                     detail.text = app.searchResults[index].text;
                     detail.tags = app.searchResults[index].tags;
-                    detail.text=detailTextChange(detail.text);
-                    detail.tags=detailTextChange(detail.tags);
-                    detail.text=detail.text.join("<br>");
-                    detail.tags=detail.tags.join("<br>");
+                    detail.text = detailTextChange(detail.text);
+                    detail.tags = detailTextChange(detail.tags);
+                    detail.text = detail.text.join("<br>");
+                    detail.tags = detail.tags.join("<br>");
                     app.detail = detail;
                     app.currentDetail = index;
-                }else{
+                } else {
                     $("tbody button").text("show");
                     $(e.target).text("show");
-                    app.currentDetail=-1;
+                    app.currentDetail = -1;
                 }
             }
         });
         $(".data-table-tagset").dataTable({});
     }
 });
-function detailTextChange(arr){
-    var newArr=[];
-    for(var i=0;i<arr.length;i++){
-        var str=arr[i];
-        if(str.match(/<b/)===null){
+function detailTextChange(arr) {
+    var newArr = [];
+    for (var i = 0; i < arr.length; i++) {
+        var str = arr[i];
+        if (str.match(/<b/) === null) {
             continue;
         }
-        str=str.replace(/<b/g,'</span><b');
-        str=str.replace(/<\/b>/g,'</b><span class="text-left detail-text">');
-        newArr.push('<span class="text-right detail-text">'+str+'</span>');
+        str = str.replace(/<b/g, '</span><b');
+        str = str.replace(/<\/b>/g, '</b><span class="text-left detail-text">');
+        newArr.push('<span class="text-right detail-text">' + str + '</span>');
     }
     return newArr;
 }
