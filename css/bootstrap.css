@@ -5005,7 +5005,7 @@ button.close {
   .hidden-print {
     display: none !important; } }
 html {
-  font-family: "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", Helvetica, Tahoma, StSun, 宋体, SimSun, sans-serif; }
+  font-family: "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", Helvetica, Tahoma, StSun, 瀹嬩綋, SimSun, sans-serif; }
 
 .loading {
   position: relative;
@@ -5095,5 +5095,20 @@ img.nav-img {
   margin-top: 5px;
   padding-top: 5px;
   padding-bottom: 5px; }
+
+span.detail-text {
+  display: inline-block;
+  overflow: hidden;
+  width: 300px;
+  height: 16px;
+  word-wrap: break-word;
+  vertical-align: middle; }
+
+b.match {
+  display: inline-block;
+  vertical-align: middle;
+  height: 16px;
+  padding-left: 5px;
+  padding-right: 5px; }
 
 /*# sourceMappingURL=bootstrap.css.map */

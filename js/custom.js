@@ -230,12 +230,16 @@ var app = new Vue({
                     $("tbody button").text("show");
                     $(e.target).text("hide");
                     var detail = {};
-                    detail.text = app.searchResults[index].text.join("<br>");
-                    detail.tags = app.searchResults[index].tags.join("<br>");
+                    detail.text = app.searchResults[index].text;
+                    detail.tags = app.searchResults[index].tags;
+                    detail.text=detailTextChange(detail.text);
+                    detail.tags=detailTextChange(detail.tags);
+                    detail.text=detail.text.join("<br>");
+                    detail.tags=detail.tags.join("<br>");
                     app.detail = detail;
                     app.currentDetail = index;
                 }else{
-                    $("tbody button").text("hide");
+                    $("tbody button").text("show");
                     $(e.target).text("show");
                     app.currentDetail=-1;
                 }
@@ -244,3 +248,16 @@ var app = new Vue({
         $(".data-table-tagset").dataTable({});
     }
 });
+function detailTextChange(arr){
+    var newArr=[];
+    for(var i=0;i<arr.length;i++){
+        var str=arr[i];
+        if(str.match(/<b/)===null){
+            continue;
+        }
+        str=str.replace(/<b/g,'</span><b');
+        str=str.replace(/<\/b>/g,'</b><span class="text-left detail-text">');
+        newArr.push('<span class="text-right detail-text">'+str+'</span>');
+    }
+    return newArr;
+}
