@@ -210,6 +210,7 @@ var app = new Vue({
                             app.showTable = true;
                             $("#search-submit").removeClass("loading");
                         }
+                        app.currentDetail=-1;
                     },
                     error: function () {
                         app.searchWarning = "服务器出问题了！";
