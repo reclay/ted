@@ -256,8 +256,8 @@ function detailTextChange(arr) {
         if (str.match(/<b/) === null) {
             continue;
         }
-        str = str.replace(/<b/g, '</span><b');
-        str = str.replace(/<\/b>_\S*/g, '</b><span class="text-left detail-text">');
+        str = str.replace(/<b/, '</span><b');
+        str = str.replace(/<\/b>_\S*/, '</b><span class="text-left detail-text">');
         newArr.push('<span class="text-right detail-text">' + str + '</span>');
     }
     return newArr;
@@ -269,8 +269,8 @@ function detailTagsChange(arr) {
         if (str.match(/<b/) === null) {
             continue;
         }
-        str = str.replace(/<b/g, '</span><b');
-        str = str.replace(/<\/b>/g, '</b><span class="text-left detail-text">');
+        str = str.replace(/<b/, '</span><b');
+        str = str.replace(/<\/b>/, '</b><span class="text-left detail-text">');
         newArr.push('<span class="text-right detail-text">' + str + '</span>');
     }
     return newArr;
