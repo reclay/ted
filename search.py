@@ -63,15 +63,12 @@ def index():
 def query(query_phrase,flag):
     query_dir = INDEX_DIR+str(flag)
     ix = open_dir(query_dir)
-    print query_dir
-    print ix
     with ix.searcher(weighting=scoring.Frequency) as searcher:
         query_term = QueryParser("content", ix.schema).parse(query_phrase)
         results = searcher.search(query_term, limit=150)
         results.fragmenter.surround = 100
-	    results.fragmenter.charlimit = None
+        results.fragmenter.charlimit = None
         re_json = []
-	print len(results)
         for e in results:
             highlight = e.highlights("content",top=200).encode('utf8')
             # highlight += e.highlights("text").encode("utf8")
