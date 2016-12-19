@@ -48,15 +48,15 @@ def index():
                             content=content)
     writer.commit()
 
-    ix = create_in(INDEX_DIR2,schema2)
-    writer = ix.writer()
+    ix2 = create_in(INDEX_DIR2,schema2)
+    writer2 = ix2.writer()
     for f_name in os.listdir(DATA_DIR):
         filename = os.path.join(DATA_DIR, f_name)
         with codecs.open(filename, 'r', 'utf8') as f:
             content = f.read()
-        writer.add_document(path=f_name.decode('utf8'),
+        writer2.add_document(path=f_name.decode('utf8'),
                             content=content)
-    writer.commit()
+    writer2.commit()
 
 
 
@@ -108,5 +108,5 @@ def query_output(rs):
 if __name__ == '__main__':
     # index()
     # query(u"Duration_NN1")
-    print query(u"likely_JJ",2)
+    print query(u"father",1)
 
