@@ -13,56 +13,64 @@ import time
 import lxml.html
 from whoosh.fields import Schema, TEXT, ID, NUMERIC
 from whoosh.index import create_in, open_dir
-from whoosh.qparser import MultifieldParser
+from whoosh.qparser import QueryParser
 from whoosh import scoring
+from whoosh.analysis import FancyAnalyzer
 
 DATA_DIR = './datas/ted_en_tagged'
 SOURCE_DIR = './datas/ted_en'
 INDEX_DIR = 'index'
-
+INDEX_DIR1 = INDEX_DIR+'1' #直接检索单词
+INDEX_DIR2 = INDEX_DIR+'2' #检索高级语法
 
 def index():
-    schema = Schema(path=ID(stored=True),
-                    content=TEXT(stored=True),
-                    text=TEXT(stored=True)
+    schema1 = Schema(path=ID(stored=True),
+                    content=TEXT(stored=True,analyzer=FancyAnalyzer(stoplist=None))
                     )
-    if not os.path.exists(INDEX_DIR):
-        os.mkdir(INDEX_DIR)
 
-    ix = create_in(INDEX_DIR, schema)
+    schema2 = Schema(path=ID(stored=True),
+                    content=TEXT(stored=True)
+                    )
 
+    if not os.path.exists(INDEX_DIR1):
+        os.mkdir(INDEX_DIR1)
+    if not os.path.exists(INDEX_DIR2):
+        os.mkdir(INDEX_DIR2)
+
+
+    ix = create_in(INDEX_DIR1, schema1)
     writer = ix.writer()
-
     for f_name in os.listdir(DATA_DIR):
         filename = os.path.join(DATA_DIR, f_name)
         with codecs.open(filename, 'r', 'utf8') as f:
             content = f.read()
-        filename = os.path.join(SOURCE_DIR, f_name)
-
-        with codecs.open(filename, 'r', 'utf8') as f:
-            html_content = f.read()
-            html = lxml.html.fromstring(html_content)
-            text = u" ".join([i for i in html.xpath("//p//text()")])
-
         writer.add_document(path=f_name.decode('utf8'),
-                            content=content,
-                            text=text)
+                            content=content)
+    writer.commit()
+
+    ix = create_in(INDEX_DIR2,schema2)
+    writer = ix.writer()
+    for f_name in os.listdir(DATA_DIR):
+        filename = os.path.join(DATA_DIR, f_name)
+        with codecs.open(filename, 'r', 'utf8') as f:
+            content = f.read()
+        writer.add_document(path=f_name.decode('utf8'),
+                            content=content)
     writer.commit()
 
 
-def query(query_phrase):
-    if not os.path.exists(INDEX_DIR):
-        os.mkdir(INDEX_DIR)
 
-    ix = open_dir(INDEX_DIR)
+def query(query_phrase,flag):
+    query_dir = INDEX_DIR+str(flag)
+    ix = open_dir(query_dir)
     with ix.searcher(weighting=scoring.Frequency) as searcher:
-        query_term = MultifieldParser(["text","content"], ix.schema).parse(query_phrase)
+        query_term = QueryParser("content", ix.schema).parse(query_phrase)
         results = searcher.search(query_term, limit=150)
         results.fragmenter.surround = 100
         re_json = []
         for e in results:
             highlight = e.highlights("content").encode('utf8')
-            highlight += e.highlights("text").encode("utf8")
+            # highlight += e.highlights("text").encode("utf8")
             re_json.append((e.score, e["path"], highlight))
         rs = sorted(re_json, key=lambda x: x[0], reverse=True)
         res = query_output(rs)
@@ -83,7 +91,6 @@ def query_output(rs):
                 title = ''.join(title2)
         data["title"] = '<a href="{}">{}</a>'.format(url, title)
         data["hits"] = item[0]
-
         text = item[2]
         data["text"] = []
         data["tags"] = []
@@ -100,5 +107,6 @@ def query_output(rs):
 
 if __name__ == '__main__':
     # index()
-    query(u"Duration_NN1")
+    # query(u"Duration_NN1")
+    print query(u"likely_JJ",2)
 
