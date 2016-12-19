@@ -69,11 +69,11 @@ def query(query_phrase,flag):
         query_term = QueryParser("content", ix.schema).parse(query_phrase)
         results = searcher.search(query_term, limit=150)
         results.fragmenter.surround = 100
-	results.fragmenter.charlimit = None
+	    results.fragmenter.charlimit = None
         re_json = []
 	print len(results)
         for e in results:
-            highlight = e.highlights("content").encode('utf8')
+            highlight = e.highlights("content",top=200).encode('utf8')
             # highlight += e.highlights("text").encode("utf8")
             re_json.append((e.score, e["path"], highlight))
         rs = sorted(re_json, key=lambda x: x[0], reverse=True)
@@ -99,7 +99,7 @@ def query_output(rs):
         data["text"] = []
         data["tags"] = []
         for sen in text.split(u"..."):
-            word_list = re.findall(r'(?P<match>\<b.*\/b\>)|(?P<word>[^<^ ]+?)_(?P<tags>[\S]+)',sen)
+            word_list = re.findall(r'(?P<match>\<b.*\/b\>\S*)|(?P<word>[^<^ ]+?)_(?P<tags>[\S]+)',sen)
             word_list = [(i[0],i[1],i[2]) if i[1].find(u"\r\n")==-1 else (i[0],i[1],u"\r\n"+i[2]) for i in word_list]
             tag_text = " ".join(["".join((i[0],i[2])) for i in word_list])
             plain_text = " ".join(["".join((i[0],i[1])) for i in word_list])
