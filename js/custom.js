@@ -177,12 +177,13 @@ var app = new Vue({
             $("#search-submit").addClass("loading");
             //获取修改searchResults（可能需要datatable重新绑定）
             var value = $("#search-input").val();
+            var selectValue=$("#search-select").val();
             if (value === "") {
                 this.searchWarning = "输入值不能为空！";
                 $("#search-submit").removeClass("loading");
             }
             else {
-                var data = {"query_term": value};
+                var data = {"query_term": value,"flag":selectValue};
                 var result = $.ajax({
                     url: "http://123.206.83.147:5000/api/query",
                     data: data,
@@ -243,17 +244,3 @@ var app = new Vue({
         $(".data-table-tagset").dataTable({});
     }
 });
-function detailButton(){
-    var index=parseInt($(this).attr("data-id"));
-    var flag=$(this).text();
-    if(flag==="show"){
-        $(this).text("hide");
-        var detail = {};
-        detail.text = app.searchResults[index].text.join("<br>");
-        detail.tags = app.searchResults[index].tags.join("<br>");
-        app.detail = detail;
-        app.currentDetail = index;
-    }else{
-        app.currentDetail=-1;
-    }
-}

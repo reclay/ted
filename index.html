@@ -34,8 +34,14 @@
 
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-                <form role="form">
+                <form role="form" class="form-inline">
                     <div class="form-group">
+                        <div class="form-group">
+                            <select name="flag" class="form-control" id="search-select">
+                                <option value="1">basic</option>
+                                <option value="2">with tag</option>
+                            </select>
+                        </div>
                         <div class="input-group">
                             <input type="text" id="search-input" @keyup.enter="search" class="form-control">
                             <span @click="search" id="search-submit" class="cursor input-group-addon">search</span>
