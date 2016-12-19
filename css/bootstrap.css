@@ -5111,4 +5111,7 @@ b.match {
   padding-left: 5px;
   padding-right: 5px; }
 
+.detail-tags-tr b {
+  padding-right: 0; }
+
 /*# sourceMappingURL=bootstrap.css.map */
