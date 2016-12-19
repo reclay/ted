@@ -60,14 +60,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(result,index) in searchResults">
-                            <td v-html="result.title"></td>
-                            <td>{{result.hits}}</td>
-                            <td class="cursor">
-                                <button class="btn btn-primary" v-if="currentDetail===index" @click="detailHide(index)">hide</button>
-                                <button class="btn btn-primary" v-else @click="detailShow(index)">show</button>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>title</td>
+                        <td>hits</td>
+                        <td><button class="btn btn-primary">show</button></td>
+                    </tr>
+                        <!--<tr v-for="(result,index) in searchResults">-->
+                            <!--<td v-html="result.title"></td>-->
+                            <!--<td>{{result.hits}}</td>-->
+                            <!--<td class="cursor">-->
+                                <!--<button class="btn btn-primary" v-if="currentDetail===index" @click="detailHide(index)">hide</button>-->
+                                <!--<button class="btn btn-primary" v-else @click="detailShow(index)">show</button>-->
+                            <!--</td>-->
+                        <!--</tr>-->
                     </tbody>
                 </table>
             </div>
@@ -79,11 +84,11 @@
                 <table v-show="currentDetail>-1" class="table table-responsive table-bordered table-striped">
                     <tr>
                         <td>Plain Text Pattern</td>
-                        <td>{{detail.text}}</td>
+                        <td v-html="detail.text"></td>
                     </tr>
                     <tr>
                         <td>Grammatical Pattern (tags)</td>
-                        <td>{{detail.tags}}</td>
+                        <td v-html="detail.tags"></td>
                     </tr>
                 </table>
             </div>

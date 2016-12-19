@@ -136,18 +136,17 @@ var tagset = [
     {key: "ZZ1 ", value: "singular letter of the alphabet (e.g. A,b)"},
     {key: "ZZ2 ", value: "plural letter of the alphabet (e.g. A's, b's)"}
 ];
-var dataTable="";
+var dataTable = "";
 var app = new Vue({
     el: "#app",
     data: {
         showTable: false,
         currentDetail: -1,
         detail: {
-            text: "fhasdkfhasfsak",
-            tags: "shfajakslfhasadgdd"
+            text: "test",
+            tags: "test"
         },
-        searchResults: [
-        ],
+        searchResults: [],
         searchWarning: "",
         showTagset: false,
         tagset: tagset
@@ -157,9 +156,11 @@ var app = new Vue({
             //获取以下修改detail的值
 
             //显示detail
-            this.detail=app.searchResults[index];
+            var detail = {};
+            detail.text = app.searchResults[index].text.join("<br>");
+            detail.tags = app.searchResults[index].tags.join("<br>");
+            this.detail = detail;
             this.currentDetail = index;
-            
         },
         detailHide: function (index) {
             this.currentDetail = -1;
@@ -178,31 +179,81 @@ var app = new Vue({
             var value = $("#search-input").val();
             if (value === "") {
                 this.searchWarning = "输入值不能为空！";
-            } else if (value === "隐藏") {    //模拟结果为空
-                this.searchWarning = "结果为空！";
-                this.showTable = false;
-            } else {
-                this.searchWarning = "";
-                //显示table
-                this.showTable = true;
+                $("#search-submit").removeClass("loading");
             }
-            var data = {"query_term":value}
-            var result =$.ajax({
-                url:"http://123.206.83.147:5000/api/query",
-                data:data,
-                dataType:"jsonp",
-                async:false,
-                success:function(data){
-                  app.searchResults = data["results"];
-                }
-            });
-            //去掉loading
-            $("#search-submit").removeClass("loading");
+            else {
+                var data = {"query_term": value};
+                var result = $.ajax({
+                    url: "http://123.206.83.147:5000/api/query",
+                    data: data,
+                    dataType: "jsonp",
+                    async: false,
+                    success: function (data) {
+                        if (data["results"].length === 0) {
+                            app.searchWarning = "查询结果为空！";
+                            app.showTable = false;
+                            $("#search-submit").removeClass("loading");
+                        } else {
+                            app.searchResults = data["results"];
+                            var length=data["results"].length;
+                            app.searchWarning = "";
+                            dataTable.clear();
+                            for (var i = 0; i < length; i++) {
+                                dataTable.row.add([
+                                    data["results"][i].title,
+                                    data["results"][i].hits,
+                                    '<button class="btn btn-primary detail-button" data-id='+i+'>show</button>'
+                                ]);
+                            }
+                            dataTable.draw();
+                            app.showTable = true;
+                            $("#search-submit").removeClass("loading");
+                        }
+                    },
+                    error: function () {
+                        app.searchWarning = "服务器出问题了！";
+                        $("#search-submit").removeClass("loading");
+                    }
+                });
+            }
             return false;
         }
     },
     mounted: function () {
-        dataTable=$(".data-table").DataTable({});
-        $(".data-table-tagset").DataTable({});
+        dataTable = $(".data-table").dataTable({}).api();
+        $("tbody").click(function(e){
+            if(e.target && e.target.nodeName == "BUTTON") {
+                var index=parseInt($(e.target).attr("data-id"));
+                var flag=$(e.target).text();
+                if(flag==="show"){
+                    $("tbody button").text("show");
+                    $(e.target).text("hide");
+                    var detail = {};
+                    detail.text = app.searchResults[index].text.join("<br>");
+                    detail.tags = app.searchResults[index].tags.join("<br>");
+                    app.detail = detail;
+                    app.currentDetail = index;
+                }else{
+                    $("tbody button").text("hide");
+                    $(e.target).text("show");
+                    app.currentDetail=-1;
+                }
+            }
+        });
+        $(".data-table-tagset").dataTable({});
     }
 });
+function detailButton(){
+    var index=parseInt($(this).attr("data-id"));
+    var flag=$(this).text();
+    if(flag==="show"){
+        $(this).text("hide");
+        var detail = {};
+        detail.text = app.searchResults[index].text.join("<br>");
+        detail.tags = app.searchResults[index].tags.join("<br>");
+        app.detail = detail;
+        app.currentDetail = index;
+    }else{
+        app.currentDetail=-1;
+    }
+}
