@@ -5,6 +5,7 @@ import json
 
 app = Flask(__name__)
 
+
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""
     @wraps(func)
@@ -19,6 +20,8 @@ def jsonp(func):
             return func(*args, **kwargs)
     return decorated_function
 
+
+
 @app.route("/api/query", methods=['GET','POST'])
 @jsonp
 def query_sth():
@@ -27,9 +30,12 @@ def query_sth():
     """
     if request.method == "GET":
         query_term = request.args.get("query_term")
+        flag = request.args.get("flag",1)
     elif request.method == 'POST':
         query_term = request.form("query_term")
-    rs = query(query_term)
+        flag = request.form("flag")
+
+    rs = query(query_term,flag)
     return jsonify({'results' : rs})
 
 if __name__ == '__main__':
