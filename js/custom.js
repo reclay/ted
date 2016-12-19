@@ -147,14 +147,6 @@ var app = new Vue({
             tags: "shfajakslfhasadgdd"
         },
         searchResults: [
-            {
-                title: "dhdsdafhkas",
-                hits: 4
-            },
-            {
-                title: "cxzvzxvx",
-                hits: 6
-            }
         ],
         searchWarning: "",
         showTagset: false,
@@ -196,7 +188,7 @@ var app = new Vue({
             }
             var data = {"query_term":value}
             var result =$.ajax({
-                url:"http://127.0.0.1:5000/api/query",
+                url:"http://123.206.83.147:5000/api/query",
                 data:data,
                 dataType:"jsonp",
                 async:false,

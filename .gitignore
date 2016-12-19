@@ -5,3 +5,4 @@ fonts/
 datas/
 index/
 *.pyc
+nohup.out

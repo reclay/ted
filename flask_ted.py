@@ -5,10 +5,6 @@ import json
 
 app = Flask(__name__)
 
-
-
-
-
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""
     @wraps(func)
@@ -22,8 +18,6 @@ def jsonp(func):
         else:
             return func(*args, **kwargs)
     return decorated_function
-
-
 
 @app.route("/api/query", methods=['GET','POST'])
 @jsonp
