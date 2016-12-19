@@ -63,11 +63,15 @@ def index():
 def query(query_phrase,flag):
     query_dir = INDEX_DIR+str(flag)
     ix = open_dir(query_dir)
+    print query_dir
+    print ix
     with ix.searcher(weighting=scoring.Frequency) as searcher:
         query_term = QueryParser("content", ix.schema).parse(query_phrase)
         results = searcher.search(query_term, limit=150)
         results.fragmenter.surround = 100
+	results.fragmenter.charlimit = None
         re_json = []
+	print len(results)
         for e in results:
             highlight = e.highlights("content").encode('utf8')
             # highlight += e.highlights("text").encode("utf8")
@@ -91,10 +95,10 @@ def query_output(rs):
                 title = ''.join(title2)
         data["title"] = '<a href="{}">{}</a>'.format(url, title)
         data["hits"] = item[0]
-        text = item[2]
+        text = item[2].decode("utf8")
         data["text"] = []
         data["tags"] = []
-        for sen in text.split("..."):
+        for sen in text.split(u"..."):
             word_list = re.findall(r'(?P<match>\<b.*\/b\>)|(?P<word>[^<^ ]+?)_(?P<tags>[\S]+)',sen)
             word_list = [(i[0],i[1],i[2]) if i[1].find(u"\r\n")==-1 else (i[0],i[1],u"\r\n"+i[2]) for i in word_list]
             tag_text = " ".join(["".join((i[0],i[2])) for i in word_list])
@@ -108,5 +112,4 @@ def query_output(rs):
 if __name__ == '__main__':
     # index()
     # query(u"Duration_NN1")
-    print query(u"father",1)
-
+    print query(u"likely",1)
