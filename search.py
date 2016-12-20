@@ -2,16 +2,10 @@
 
 import os
 import codecs
-import json
 import re
-import time
+import ConfigParser   
 
-# import jieba
-# from jieba.analyse.analyzer import ChineseAnalyzer
-
-# from whoosh import index
-import lxml.html
-from whoosh.fields import Schema, TEXT, ID, NUMERIC
+from whoosh.fields import Schema, TEXT, ID
 from whoosh.index import create_in, open_dir
 from whoosh.qparser import QueryParser
 from whoosh import scoring
@@ -61,17 +55,27 @@ def index():
 
 
 def query(query_phrase,flag):
+
+    cf = ConfigParser.ConfigParser()   
+    cf.read("query.ini")  
+    limit = 150
+    limit = cf.getint("query", "results_limit") 
+    top = 200
+    top = cf.getint("query","top_hits")
+    surround = 100
+    surround = cf.getint("query","surround")
+
     query_dir = INDEX_DIR+str(flag)
     ix = open_dir(query_dir)
     with ix.searcher(weighting=scoring.Frequency) as searcher:
         query_term = QueryParser("content", ix.schema).parse(query_phrase)
-        results = searcher.search(query_term, limit=150)
-        results.fragmenter.surround = 100
+        print query_term
+        results = searcher.search(query_term, limit=limit)
+        results.fragmenter.surround = surround
         results.fragmenter.charlimit = None
         re_json = []
         for e in results:
-            highlight = e.highlights("content",top=200).encode('utf8')
-            # highlight += e.highlights("text").encode("utf8")
+            highlight = e.highlights("content",top=top).encode('utf8')
             re_json.append((e.score, e["path"], highlight))
         rs = sorted(re_json, key=lambda x: x[0], reverse=True)
         res = query_output(rs)
@@ -85,16 +89,19 @@ def query_output(rs):
         data = dict()
         url = os.path.join(SOURCE_DIR,item[1])
         title = item[1]
+        
         with open(url) as f:
             content = f.read()
             title2 = re.findall(r'\<h3\>(.*)\<\/h3\>', content)
             if len(title2)>0:
                 title = ''.join(title2)
+        
         data["title"] = '<a href="{}">{}</a>'.format(url, title)
         data["hits"] = item[0]
         text = item[2].decode("utf8")
         data["text"] = []
         data["tags"] = []
+
         for sen in text.split(u"..."):
             word_list = re.findall(r'(?P<match>\<b.*\/b\>\S*)|(?P<word>[^<^ ]+?)_(?P<tags>[\S]+)',sen)
             word_list = [(i[0],i[1],i[2]) if i[1].find(u"\r\n")==-1 else (i[0],i[1],u"\r\n"+i[2]) for i in word_list]
@@ -103,10 +110,9 @@ def query_output(rs):
             data["text"].append(plain_text)
             data["tags"].append(tag_text)
         rs_list.append(data)
+
     return rs_list
 
 
 if __name__ == '__main__':
-    # index()
-    # query(u"Duration_NN1")
     print query(u"likely",1)
